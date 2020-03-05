@@ -1,13 +1,9 @@
-package de.ruegnerlukas.jxclipboard.base;
+package de.ruegnerlukas.jxclipboard.base.content;
 
-import de.ruegnerlukas.simpleapplication.core.presentation.module.ExposedCommand;
-import de.ruegnerlukas.simpleapplication.core.presentation.module.ExposedEvent;
 import de.ruegnerlukas.simpleapplication.core.presentation.module.ModuleView;
 import de.ruegnerlukas.simpleapplication.core.presentation.utils.Anchors;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
-
-import java.util.List;
 
 public class ContentModuleView implements ModuleView {
 
@@ -19,20 +15,5 @@ public class ContentModuleView implements ModuleView {
 		pane.getChildren().add(btn);
 	}
 
-
-
-
-	@Override
-	public List<ExposedEvent> getExposedEvents() {
-		return null;
-	}
-
-
-
-
-	@Override
-	public List<ExposedCommand> getExposedCommands() {
-		return null;
-	}
 
 }

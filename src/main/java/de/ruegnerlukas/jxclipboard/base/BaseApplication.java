@@ -17,7 +17,7 @@ public class BaseApplication extends Plugin {
 	/**
 	 * The (plugin) id of the application base
 	 */
-	private static final String PLUGIN_ID = "jxclipboard.base";
+	public static final String PLUGIN_ID = "jxclipboard.base";
 
 	/**
 	 * The (plugin) name of the application base

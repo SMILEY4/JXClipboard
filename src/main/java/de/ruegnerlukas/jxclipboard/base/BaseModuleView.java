@@ -1,13 +1,11 @@
 package de.ruegnerlukas.jxclipboard.base;
 
-import de.ruegnerlukas.simpleapplication.core.presentation.module.ExposedCommand;
-import de.ruegnerlukas.simpleapplication.core.presentation.module.ExposedEvent;
+import de.ruegnerlukas.jxclipboard.base.content.ContentModule;
+import de.ruegnerlukas.jxclipboard.base.toolbar.ToolbarModule;
 import de.ruegnerlukas.simpleapplication.core.presentation.module.ModuleView;
 import de.ruegnerlukas.simpleapplication.core.presentation.utils.Anchors;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Pane;
-
-import java.util.List;
 
 public class BaseModuleView implements ModuleView {
 
@@ -41,20 +39,5 @@ public class BaseModuleView implements ModuleView {
 
 	}
 
-
-
-
-	@Override
-	public List<ExposedEvent> getExposedEvents() {
-		return null;
-	}
-
-
-
-
-	@Override
-	public List<ExposedCommand> getExposedCommands() {
-		return null;
-	}
 
 }

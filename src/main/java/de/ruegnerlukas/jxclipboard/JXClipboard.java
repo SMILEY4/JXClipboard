@@ -37,6 +37,7 @@ public class JXClipboard {
 		configuration.getProviderFactories().add(new IntegerFactory("jfclipboard.frameheight", FRAME_HEIGHT));
 
 		configuration.getPlugins().add(new BaseApplication());
+		configuration.getPlugins().add(new TestPlugin());
 
 		new Application(configuration).run();
 	}

@@ -1,17 +1,16 @@
-package de.ruegnerlukas.jxclipboard.base;
+package de.ruegnerlukas.jxclipboard.base.toolbar;
 
 import de.ruegnerlukas.simpleapplication.core.presentation.module.Module;
 import de.ruegnerlukas.simpleapplication.core.presentation.module.ModuleController;
 
-public class BaseModule extends Module {
+public class ToolbarModule extends Module {
 
 
 	/**
 	 * The default constructor
 	 */
-	public BaseModule() {
-		super(new BaseModuleView(), new ModuleController.EmptyController());
+	public ToolbarModule() {
+		super(new ToolbarModuleView(), new ModuleController.EmptyController());
 	}
-
 
 }
