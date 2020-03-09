@@ -4,7 +4,6 @@ import de.ruegnerlukas.jxclipboard.base.content.ContentModule;
 import de.ruegnerlukas.jxclipboard.base.toolbar.ToolbarModule;
 import de.ruegnerlukas.simpleapplication.core.presentation.module.ModuleView;
 import de.ruegnerlukas.simpleapplication.core.presentation.utils.Anchors;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Pane;
 
 public class BaseModuleView implements ModuleView {
@@ -30,13 +29,7 @@ public class BaseModuleView implements ModuleView {
 		final ContentModule contentModule = new ContentModule();
 		Anchors.setAnchors(contentModule, 0, 0, 0, 0);
 
-		final ScrollPane contentScrollPane = new ScrollPane();
-		contentScrollPane.setFitToHeight(true);
-		Anchors.setAnchors(contentScrollPane, TOOLBAR_HEIGHT, 0, 0, 0);
-		contentScrollPane.setContent(contentModule);
-
-		pane.getChildren().addAll(toolbarModule, contentScrollPane);
-
+		pane.getChildren().addAll(toolbarModule, contentModule);
 	}
 
 
