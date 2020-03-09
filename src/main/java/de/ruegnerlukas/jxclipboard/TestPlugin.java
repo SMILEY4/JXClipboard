@@ -1,6 +1,8 @@
 package de.ruegnerlukas.jxclipboard;
 
 import de.ruegnerlukas.jxclipboard.base.BaseApplication;
+import de.ruegnerlukas.jxclipboard.base.content.AddEntryCommand;
+import de.ruegnerlukas.jxclipboard.base.content.EntryRemovedEvent;
 import de.ruegnerlukas.jxclipboard.base.toolbar.AddToolCommand;
 import de.ruegnerlukas.jxclipboard.base.toolbar.ToolActionEvent;
 import de.ruegnerlukas.simpleapplication.common.events.EventPackage;
@@ -40,6 +42,24 @@ public class TestPlugin extends Plugin {
 		eventService.subscribe(ToolActionEvent.EVENT_ID, eventPackage -> {
 			ToolActionEvent event = (ToolActionEvent) eventPackage.getEvent();
 			log.info("[ToolActionEvent] {}: {}.", event.getToolName(), event.isSelected());
+		});
+
+		eventService.publish(AddEntryCommand.COMMAND_ID, new EventPackage<>(
+				AddEntryCommand.labelEntry("entryA", false, "Fixed Entry A")));
+
+		eventService.publish(AddEntryCommand.COMMAND_ID, new EventPackage<>(
+				AddEntryCommand.labelEntry("entryB", true, "Entry B")));
+
+		eventService.publish(AddEntryCommand.COMMAND_ID, new EventPackage<>(
+				AddEntryCommand.labelEntry("entryC", true, "Entry C")));
+
+		eventService.publish(AddEntryCommand.COMMAND_ID, new EventPackage<>(
+				AddEntryCommand.labelEntry("entryD", true, "Entry D")));
+
+
+		eventService.subscribe(EntryRemovedEvent.EVENT_ID, eventPackage -> {
+			EntryRemovedEvent event = (EntryRemovedEvent) eventPackage.getEvent();
+			log.info("[EntryRemovedEvent] {}: {}.", event.getEntryId(), event.isRemovedByUser());
 		});
 	}
 

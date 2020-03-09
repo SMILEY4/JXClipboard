@@ -27,7 +27,7 @@ public class BaseModuleView implements ModuleView {
 		Anchors.setAnchors(toolbarModule, 0, null, 0, 0);
 
 		final ContentModule contentModule = new ContentModule();
-		Anchors.setAnchors(contentModule, 0, 0, 0, 0);
+		Anchors.setAnchors(contentModule, TOOLBAR_HEIGHT, 0, 0, 0);
 
 		pane.getChildren().addAll(toolbarModule, contentModule);
 	}
