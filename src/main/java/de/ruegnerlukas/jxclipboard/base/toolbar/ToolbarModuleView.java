@@ -6,6 +6,7 @@ import de.ruegnerlukas.simpleapplication.core.presentation.module.ExposedEvent;
 import de.ruegnerlukas.simpleapplication.core.presentation.module.ModuleView;
 import de.ruegnerlukas.simpleapplication.core.presentation.utils.Anchors;
 import javafx.application.Platform;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
@@ -13,6 +14,7 @@ import javafx.scene.layout.Pane;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Optional;
 
 public class ToolbarModuleView implements ModuleView {
 
@@ -32,6 +34,11 @@ public class ToolbarModuleView implements ModuleView {
 	 */
 	private EventSource<AddToolCommand> addToolCommand;
 
+	/**
+	 * The event source for {@link AddToolCommand}s.
+	 */
+	private EventSource<RemoveToolCommand> removeToolCommand;
+
 
 
 
@@ -45,6 +52,9 @@ public class ToolbarModuleView implements ModuleView {
 
 		addToolCommand = new EventSource<>();
 		addToolCommand.subscribe(cmd -> Platform.runLater(() -> onAddToolCommand(cmd)));
+
+		removeToolCommand = new EventSource<>();
+		removeToolCommand.subscribe(cmd -> Platform.runLater(() -> onRemoveToolCommand(cmd)));
 	}
 
 
@@ -59,15 +69,50 @@ public class ToolbarModuleView implements ModuleView {
 		final Tool tool = new Tool(command.getToolName(), command.isToggle());
 		if (tool.isToggle()) {
 			toolbar.getItems().add(tool.getToggleButton());
-			tool.getToggleButton().setOnAction(btnEvent -> {
-				toolActionEvent(tool.getName(), tool.getToggleButton().isSelected());
-			});
+			tool.getToggleButton().setOnAction(btnEvent -> toolActionEvent(tool.getName(), tool.getToggleButton().isSelected()));
 		} else {
 			toolbar.getItems().add(tool.getButton());
-			tool.getButton().setOnAction(btnEvent -> {
-				toolActionEvent(tool.getName(), true);
-			});
+			tool.getButton().setOnAction(btnEvent -> toolActionEvent(tool.getName(), true));
 		}
+	}
+
+
+
+
+	/**
+	 * Handles the {@link RemoveToolCommand}.
+	 *
+	 * @param command the {@link RemoveToolCommand}
+	 */
+	private void onRemoveToolCommand(final RemoveToolCommand command) {
+		findToolNode(command.getToolName()).ifPresent(node -> {
+			toolbar.getItems().remove(node);
+		});
+	}
+
+
+
+
+	/**
+	 * Finds the node in the toolbar with the given name
+	 *
+	 * @param toolName the name of the tool
+	 * @return the node.
+	 */
+	private Optional<Node> findToolNode(final String toolName) {
+		return toolbar.getItems().stream().filter(item -> {
+			if (item instanceof Button) {
+				if (((Button) item).getText().equals(toolName)) {
+					return true;
+				}
+			}
+			if (item instanceof ToggleButton) {
+				if (((ToggleButton) item).getText().equals(toolName)) {
+					return true;
+				}
+			}
+			return false;
+		}).findFirst();
 	}
 
 
@@ -97,7 +142,10 @@ public class ToolbarModuleView implements ModuleView {
 
 	@Override
 	public List<ExposedCommand> getExposedCommands() {
-		return List.of(ExposedCommand.global(AddToolCommand.COMMAND_ID, addToolCommand));
+		return List.of(
+				ExposedCommand.global(AddToolCommand.COMMAND_ID, addToolCommand),
+				ExposedCommand.global(RemoveToolCommand.COMMAND_ID, removeToolCommand)
+		);
 	}
 
 

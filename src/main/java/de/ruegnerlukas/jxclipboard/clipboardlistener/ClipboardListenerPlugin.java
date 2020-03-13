@@ -1,6 +1,7 @@
 package de.ruegnerlukas.jxclipboard.clipboardlistener;
 
 import de.ruegnerlukas.jxclipboard.base.toolbar.AddToolCommand;
+import de.ruegnerlukas.jxclipboard.base.toolbar.RemoveToolCommand;
 import de.ruegnerlukas.jxclipboard.base.toolbar.ToolActionEvent;
 import de.ruegnerlukas.jxclipboard.clipboard.ClipboardPlugin;
 import de.ruegnerlukas.simpleapplication.common.events.EventPackage;
@@ -107,6 +108,8 @@ public class ClipboardListenerPlugin extends Plugin {
 
 	@Override
 	public void onUnload() {
+		eventServiceProvider.get().publish(RemoveToolCommand.COMMAND_ID,
+				new EventPackage<>(new RemoveToolCommand(TOOLNAME_ENABLE_LISTENER)));
 	}
 
 }

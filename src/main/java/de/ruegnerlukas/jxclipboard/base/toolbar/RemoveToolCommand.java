@@ -7,13 +7,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class AddToolCommand {
+public class RemoveToolCommand {
 
 
 	/**
 	 * The id of this command type
 	 */
-	public static final String COMMAND_ID = "jxclipboard.toolbar.addtool";
+	public static final String COMMAND_ID = "jxclipboard.toolbar.removetool";
 
 
 	/**
@@ -21,9 +21,5 @@ public class AddToolCommand {
 	 */
 	private final String toolName;
 
-	/**
-	 * Whether the tool is toggleable.
-	 */
-	private boolean toggle;
 
 }

@@ -3,6 +3,7 @@ package de.ruegnerlukas.jxclipboard.clipboard;
 import de.ruegnerlukas.jxclipboard.base.BasePlugin;
 import de.ruegnerlukas.jxclipboard.base.content.AddEntryCommand;
 import de.ruegnerlukas.jxclipboard.base.toolbar.AddToolCommand;
+import de.ruegnerlukas.jxclipboard.base.toolbar.RemoveToolCommand;
 import de.ruegnerlukas.jxclipboard.base.toolbar.ToolActionEvent;
 import de.ruegnerlukas.jxclipboard.clipboardlistener.ClipboardListenerPlugin;
 import de.ruegnerlukas.simpleapplication.common.events.EventPackage;
@@ -153,6 +154,8 @@ public class ClipboardPlugin extends Plugin {
 
 	@Override
 	public void onUnload() {
+		eventServiceProvider.get().publish(RemoveToolCommand.COMMAND_ID,
+				new EventPackage<>(new RemoveToolCommand(TOOLNAME_SAVE_CLIPBOARD)));
 	}
 
 }
