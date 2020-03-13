@@ -5,6 +5,7 @@ import de.ruegnerlukas.simpleapplication.core.presentation.module.ExposedCommand
 import de.ruegnerlukas.simpleapplication.core.presentation.module.ExposedEvent;
 import de.ruegnerlukas.simpleapplication.core.presentation.module.ModuleView;
 import de.ruegnerlukas.simpleapplication.core.presentation.utils.Anchors;
+import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
@@ -43,7 +44,7 @@ public class ToolbarModuleView implements ModuleView {
 		toolActionEvent = new EventSource<>();
 
 		addToolCommand = new EventSource<>();
-		addToolCommand.subscribe(this::onAddToolCommand);
+		addToolCommand.subscribe(cmd -> Platform.runLater(() -> onAddToolCommand(cmd)));
 	}
 
 

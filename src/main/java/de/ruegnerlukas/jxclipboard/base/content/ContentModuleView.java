@@ -6,6 +6,7 @@ import de.ruegnerlukas.simpleapplication.core.presentation.module.ExposedCommand
 import de.ruegnerlukas.simpleapplication.core.presentation.module.ExposedEvent;
 import de.ruegnerlukas.simpleapplication.core.presentation.module.ModuleView;
 import de.ruegnerlukas.simpleapplication.core.presentation.utils.Anchors;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -48,8 +49,8 @@ public class ContentModuleView implements ModuleView {
 
 	@Override
 	public void initialize(final Pane pane) {
-		addEntryCommand.subscribe(event -> addEntry(event.getEntryId(), event.getNode(), event.isRemovable()));
-		removeEntryCommand.subscribe(event -> removeEntry(event.getEntryId(), false));
+		addEntryCommand.subscribe(event -> Platform.runLater(() -> addEntry(event.getEntryId(), event.getNode(), event.isRemovable())));
+		removeEntryCommand.subscribe(event -> Platform.runLater(() -> removeEntry(event.getEntryId(), false)));
 	}
 
 
@@ -69,7 +70,7 @@ public class ContentModuleView implements ModuleView {
 		if (!exists) {
 			final ContentEntry entry = new ContentEntry(id, node, removable);
 			entry.getRemoveEvent().subscribe(event -> removeEntry(entry.getEntryId(), true));
-			boxContent.getChildren().add(entry);
+			boxContent.getChildren().add(0, entry);
 		}
 	}
 
@@ -157,7 +158,7 @@ public class ContentModuleView implements ModuleView {
 
 
 		/**
-		 * @param entryId        the id of the entry
+		 * @param entryId   the id of the entry
 		 * @param node      the javafx node
 		 * @param removable whether the entry is removable by the user
 		 */

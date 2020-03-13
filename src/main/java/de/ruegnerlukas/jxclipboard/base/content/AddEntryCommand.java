@@ -1,7 +1,11 @@
 package de.ruegnerlukas.jxclipboard.base.content;
 
+import de.ruegnerlukas.simpleapplication.common.callbacks.EmptyCallback;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -60,5 +64,34 @@ public class AddEntryCommand {
 				.node(new Label(text))
 				.build();
 	}
+
+
+
+
+	public static AddEntryCommand clipboardEntry(final String id, final String content, final EmptyCallback onCopyCallback) {
+
+		final Label label = new Label(content);
+		label.setMinWidth(0);
+		label.setPrefWidth(10000);
+		label.setMaxWidth(10000);
+
+		final Button button = new Button("C");
+		button.setMinSize(35, 35);
+		button.setPrefSize(35, 35);
+		button.setMaxSize(35, 35);
+		button.setOnAction(e -> onCopyCallback.execute());
+
+		final HBox box = new HBox();
+		box.setAlignment(Pos.CENTER_LEFT);
+		box.getChildren().addAll(label, button);
+
+		return AddEntryCommand.builder()
+				.entryId(id)
+				.removable(true)
+				.node(box)
+				.build();
+
+	}
+
 
 }

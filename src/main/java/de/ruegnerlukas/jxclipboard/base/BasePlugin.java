@@ -11,7 +11,7 @@ import javafx.geometry.Dimension2D;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class BaseApplication extends Plugin {
+public class BasePlugin extends Plugin {
 
 
 	/**
@@ -60,7 +60,7 @@ public class BaseApplication extends Plugin {
 	/**
 	 * The default constructor
 	 */
-	public BaseApplication() {
+	public BasePlugin() {
 		super(PLUGIN_ID, DISPLAY_NAME, PLUGIN_VERSION, true);
 		this.getDependencyIds().add(ApplicationConstants.COMPONENT_VIEW_SYSTEM);
 	}

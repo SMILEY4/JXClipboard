@@ -1,6 +1,8 @@
 package de.ruegnerlukas.jxclipboard;
 
-import de.ruegnerlukas.jxclipboard.base.BaseApplication;
+import de.ruegnerlukas.jxclipboard.base.BasePlugin;
+import de.ruegnerlukas.jxclipboard.clipboardlistener.ClipboardListenerPlugin;
+import de.ruegnerlukas.jxclipboard.clipboard.ClipboardPlugin;
 import de.ruegnerlukas.simpleapplication.common.instanceproviders.factories.IntegerFactory;
 import de.ruegnerlukas.simpleapplication.common.instanceproviders.factories.StringFactory;
 import de.ruegnerlukas.simpleapplication.core.application.Application;
@@ -36,8 +38,9 @@ public class JXClipboard {
 		configuration.getProviderFactories().add(new IntegerFactory("jfclipboard.framewidth", FRAME_WIDTH));
 		configuration.getProviderFactories().add(new IntegerFactory("jfclipboard.frameheight", FRAME_HEIGHT));
 
-		configuration.getPlugins().add(new BaseApplication());
-		configuration.getPlugins().add(new TestPlugin());
+		configuration.getPlugins().add(new BasePlugin());
+		configuration.getPlugins().add(new ClipboardPlugin());
+		configuration.getPlugins().add(new ClipboardListenerPlugin());
 
 		new Application(configuration).run();
 	}
