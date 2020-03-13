@@ -1,5 +1,6 @@
 package de.ruegnerlukas.jxclipboard;
 
+import de.ruegnerlukas.jxclipboard.alwaysOnTop.AlwaysOnTopPlugin;
 import de.ruegnerlukas.jxclipboard.base.BasePlugin;
 import de.ruegnerlukas.jxclipboard.clipboardlistener.ClipboardListenerPlugin;
 import de.ruegnerlukas.jxclipboard.clipboard.ClipboardPlugin;
@@ -41,6 +42,7 @@ public class JXClipboard {
 		configuration.getPlugins().add(new BasePlugin());
 		configuration.getPlugins().add(new ClipboardPlugin());
 		configuration.getPlugins().add(new ClipboardListenerPlugin());
+		configuration.getPlugins().add(new AlwaysOnTopPlugin());
 
 		new Application(configuration).run();
 	}
