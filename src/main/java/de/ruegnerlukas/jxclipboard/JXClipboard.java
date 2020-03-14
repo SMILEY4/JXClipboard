@@ -2,8 +2,8 @@ package de.ruegnerlukas.jxclipboard;
 
 import de.ruegnerlukas.jxclipboard.alwaysOnTop.AlwaysOnTopPlugin;
 import de.ruegnerlukas.jxclipboard.base.BasePlugin;
-import de.ruegnerlukas.jxclipboard.clipboardlistener.ClipboardListenerPlugin;
 import de.ruegnerlukas.jxclipboard.clipboard.ClipboardPlugin;
+import de.ruegnerlukas.jxclipboard.clipboardlistener.ClipboardListenerPlugin;
 import de.ruegnerlukas.simpleapplication.common.instanceproviders.factories.IntegerFactory;
 import de.ruegnerlukas.simpleapplication.common.instanceproviders.factories.StringFactory;
 import de.ruegnerlukas.simpleapplication.core.application.Application;

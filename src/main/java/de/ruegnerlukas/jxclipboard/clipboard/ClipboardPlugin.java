@@ -10,6 +10,8 @@ import de.ruegnerlukas.simpleapplication.common.events.EventPackage;
 import de.ruegnerlukas.simpleapplication.common.events.specializedevents.EventBusListener;
 import de.ruegnerlukas.simpleapplication.common.instanceproviders.providers.Provider;
 import de.ruegnerlukas.simpleapplication.core.events.EventService;
+import de.ruegnerlukas.simpleapplication.core.extensions.ExtensionPoint;
+import de.ruegnerlukas.simpleapplication.core.extensions.ExtensionPointService;
 import de.ruegnerlukas.simpleapplication.core.plugins.Plugin;
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,6 +57,27 @@ public class ClipboardPlugin extends Plugin {
 	 */
 	private final Provider<EventService> eventServiceProvider = new Provider<>(EventService.class);
 
+	/**
+	 * The id of the extension point for inserting custom {@link ClipboardWriter}s
+	 */
+	public static final String EXTENSION_POINT_CLIPBOARD_WRITER = "ep.clipboard.writer";
+
+	/**
+	 * The id of the extension point for inserting custom {@link ClipboardReader}s
+	 */
+	public static final String EXTENSION_POINT_CLIPBOARD_READER = "ep.clipboard.reader";
+
+
+	/**
+	 * The clipboard reader. Can be customized through the extension point.
+	 */
+	private ClipboardWriter writer;
+
+	/**
+	 * The clipboard writer. Can be customized through the extension point.
+	 */
+	private ClipboardReader reader;
+
 
 
 
@@ -72,9 +95,8 @@ public class ClipboardPlugin extends Plugin {
 	@Override
 	public void onLoad() {
 		addSaveClipboardTool();
-		eventServiceProvider.get().subscribe(ClipboardListenerPlugin.EVENT_CLIPBOARD_CHANGED, eventPackage -> {
-			saveClipboard((String) eventPackage.getEvent());
-		});
+		setupClipboardFunctions();
+		setupClipboardListener();
 	}
 
 
@@ -98,35 +120,71 @@ public class ClipboardPlugin extends Plugin {
 
 
 	/**
-	 * Saves the current content of the clipboard and adds a new entry to the content list.
+	 * Adds the listener for clipboard events.
 	 */
-	private void saveCurrentClipboard() {
-		readClipboardString().ifPresent(this::saveClipboard);
+	private void setupClipboardListener() {
+		eventServiceProvider.get().subscribe(ClipboardListenerPlugin.EVENT_CLIPBOARD_CHANGED, eventPackage -> {
+			saveClipboard((String) eventPackage.getEvent());
+		});
 	}
 
 
 
 
 	/**
-	 * Saves the given content of the clipboard and adds a new entry to the content list.
+	 * Setup clipboard reader, writer and the extension points.
+	 */
+	private void setupClipboardFunctions() {
+
+		final ExtensionPointService extensionPointService = new Provider<>(ExtensionPointService.class).get();
+
+		this.writer = this::writeToClipboard;
+		ExtensionPoint extensionClipboardWriter = new ExtensionPoint(EXTENSION_POINT_CLIPBOARD_WRITER);
+		extensionClipboardWriter.addSupportedTypeAllowNull(ClipboardWriter.class, writer -> {
+			if (writer == null) {
+				this.writer = this::writeToClipboard;
+			} else {
+				this.writer = writer;
+			}
+		});
+		extensionPointService.register(extensionClipboardWriter);
+
+		this.reader = () -> readFromClipboard().orElse(null);
+		ExtensionPoint extensionClipboardReader = new ExtensionPoint(EXTENSION_POINT_CLIPBOARD_READER);
+		extensionClipboardReader.addSupportedTypeAllowNull(ClipboardReader.class, reader -> {
+			if (reader == null) {
+				this.reader = () -> readFromClipboard().orElse(null);
+			} else {
+				this.reader = reader;
+			}
+		});
+		extensionPointService.register(extensionClipboardReader);
+
+	}
+
+
+
+
+	/**
+	 * Writes the given string to the system clipboard.
 	 *
-	 * @param content the content of the clipboard
+	 * @param content the content to save to the clipboard
 	 */
-	private void saveClipboard(final String content) {
-		final String entryId = UUID.randomUUID().toString();
-		final AddEntryCommand command = AddEntryCommand.clipboardEntry(entryId, content, () -> saveToClipboard(content));
-		eventServiceProvider.get().publish(AddEntryCommand.COMMAND_ID, new EventPackage<>(command));
+	private void writeToClipboard(final String content) {
+		StringSelection selection = new StringSelection(content);
+		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		clipboard.setContents(selection, selection);
 	}
 
 
 
 
 	/**
-	 * Get the current text content from the clipboard.
+	 * Reads the current text content from the clipboard.
 	 *
 	 * @return the content as a string
 	 */
-	private Optional<String> readClipboardString() {
+	private Optional<String> readFromClipboard() {
 		String content = null;
 		try {
 			content = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
@@ -139,14 +197,21 @@ public class ClipboardPlugin extends Plugin {
 
 
 	/**
-	 * Saves the given string to the system clipboard.
-	 *
-	 * @param content the content to save to the clipboard
+	 * Saves the current content of the clipboard and adds a new entry to the content list.
 	 */
-	private void saveToClipboard(final String content) {
-		StringSelection selection = new StringSelection(content);
-		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-		clipboard.setContents(selection, selection);
+	private void saveCurrentClipboard() {
+		Optional.ofNullable(reader.read()).ifPresent(this::saveClipboard);
+	}
+
+	/**
+	 * Saves the given content of the clipboard and adds a new entry to the content list.
+	 *
+	 * @param content the content of the clipboard
+	 */
+	private void saveClipboard(final String content) {
+		final String entryId = UUID.randomUUID().toString();
+		final AddEntryCommand command = AddEntryCommand.clipboardEntry(entryId, content, () -> writer.write(content));
+		eventServiceProvider.get().publish(AddEntryCommand.COMMAND_ID, new EventPackage<>(command));
 	}
 
 

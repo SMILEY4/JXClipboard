@@ -4,11 +4,17 @@ import de.ruegnerlukas.jxclipboard.base.toolbar.AddToolCommand;
 import de.ruegnerlukas.jxclipboard.base.toolbar.RemoveToolCommand;
 import de.ruegnerlukas.jxclipboard.base.toolbar.ToolActionEvent;
 import de.ruegnerlukas.jxclipboard.clipboard.ClipboardPlugin;
+import de.ruegnerlukas.jxclipboard.clipboard.ClipboardWriter;
 import de.ruegnerlukas.simpleapplication.common.events.EventPackage;
 import de.ruegnerlukas.simpleapplication.common.events.specializedevents.EventBusListener;
 import de.ruegnerlukas.simpleapplication.common.instanceproviders.providers.Provider;
 import de.ruegnerlukas.simpleapplication.core.events.EventService;
+import de.ruegnerlukas.simpleapplication.core.extensions.ExtensionPointService;
 import de.ruegnerlukas.simpleapplication.core.plugins.Plugin;
+
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 
 /**
  * - Listens for changes of the clipboard content and triggers a clipboard event.
@@ -48,6 +54,16 @@ public class ClipboardListenerPlugin extends Plugin {
 	private final Provider<EventService> eventServiceProvider = new Provider<>(EventService.class);
 
 	/**
+	 * The provider for the extension point service
+	 */
+	private final Provider<ExtensionPointService> extensionPointService = new Provider<>(ExtensionPointService.class);
+
+	/**
+	 * The clipboard listener
+	 */
+	private ClipBoardListener listener;
+
+	/**
 	 * Whether events for changed clipboard content are triggered.
 	 */
 	private volatile boolean triggerEvents = false;
@@ -85,6 +101,17 @@ public class ClipboardListenerPlugin extends Plugin {
 			final ToolActionEvent event = eventPackage.getEvent();
 			if (event.getToolName().equals(TOOLNAME_ENABLE_LISTENER)) {
 				this.triggerEvents = event.isSelected();
+				extensionPointService.get().find(ClipboardPlugin.EXTENSION_POINT_CLIPBOARD_WRITER).ifPresent(extensionPoint -> {
+					if (event.isSelected()) {
+						extensionPoint.provide(ClipboardWriter.class, (ClipboardWriter) content -> {
+							StringSelection selection = new StringSelection(content);
+							Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+							clipboard.setContents(selection, listener);
+						});
+					} else {
+						extensionPoint.provide(ClipboardWriter.class, null);
+					}
+				});
 			}
 		});
 	}
@@ -96,11 +123,12 @@ public class ClipboardListenerPlugin extends Plugin {
 	 * Start the clipboard listener.
 	 */
 	private void startListener() {
-		new ClipBoardListener(clipboardContent -> {
+		this.listener = new ClipBoardListener(clipboardContent -> {
 			if (triggerEvents) {
 				eventServiceProvider.get().publish(EVENT_CLIPBOARD_CHANGED, new EventPackage<>(clipboardContent));
 			}
-		}).start();
+		});
+		this.listener.start();
 	}
 
 
