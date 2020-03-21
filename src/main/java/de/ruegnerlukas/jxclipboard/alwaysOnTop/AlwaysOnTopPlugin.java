@@ -3,13 +3,15 @@ package de.ruegnerlukas.jxclipboard.alwaysOnTop;
 import de.ruegnerlukas.jxclipboard.base.BasePlugin;
 import de.ruegnerlukas.jxclipboard.base.toolbar.AddToolCommand;
 import de.ruegnerlukas.jxclipboard.base.toolbar.ToolActionEvent;
-import de.ruegnerlukas.simpleapplication.common.events.EventPackage;
-import de.ruegnerlukas.simpleapplication.common.events.specializedevents.EventBusListener;
+import de.ruegnerlukas.simpleapplication.common.events.Channel;
 import de.ruegnerlukas.simpleapplication.common.instanceproviders.providers.Provider;
 import de.ruegnerlukas.simpleapplication.core.application.ApplicationConstants;
 import de.ruegnerlukas.simpleapplication.core.events.EventService;
 import de.ruegnerlukas.simpleapplication.core.plugins.Plugin;
+import de.ruegnerlukas.simpleapplication.core.plugins.PluginInformation;
 import javafx.stage.Stage;
+
+import java.util.Set;
 
 public class AlwaysOnTopPlugin extends Plugin {
 
@@ -52,8 +54,13 @@ public class AlwaysOnTopPlugin extends Plugin {
 	 * Default constructor.
 	 */
 	public AlwaysOnTopPlugin() {
-		super(PLUGIN_ID, DISPLAY_NAME, PLUGIN_VERSION, true);
-		this.getDependencyIds().add(BasePlugin.PLUGIN_ID);
+		super(PluginInformation.builder()
+				.id(PLUGIN_ID)
+				.version(PLUGIN_VERSION)
+				.displayName(DISPLAY_NAME)
+				.autoload(true)
+				.dependencyIds(Set.of(BasePlugin.PLUGIN_ID))
+				.build());
 	}
 
 
@@ -62,9 +69,9 @@ public class AlwaysOnTopPlugin extends Plugin {
 	@Override
 	public void onLoad() {
 		final EventService eventService = eventServiceProvider.get();
-		eventService.publish(AddToolCommand.COMMAND_ID, new EventPackage<>(new AddToolCommand(TOOLNAME_ALWAYS_ON_TOP, true)));
-		eventService.subscribe(ToolActionEvent.EVENT_ID, (EventBusListener<ToolActionEvent>) eventPackage -> {
-			final ToolActionEvent event = eventPackage.getEvent();
+		eventService.publish(new AddToolCommand(TOOLNAME_ALWAYS_ON_TOP, true));
+		eventService.subscribe(Channel.type(ToolActionEvent.class), publishable -> {
+			final ToolActionEvent event = (ToolActionEvent) publishable;
 			if (event.getToolName().equals(TOOLNAME_ALWAYS_ON_TOP)) {
 				onToolEvent(event.isSelected());
 			}

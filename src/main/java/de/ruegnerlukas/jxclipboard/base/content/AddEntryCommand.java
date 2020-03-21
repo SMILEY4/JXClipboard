@@ -1,6 +1,7 @@
 package de.ruegnerlukas.jxclipboard.base.content;
 
 import de.ruegnerlukas.simpleapplication.common.callbacks.EmptyCallback;
+import de.ruegnerlukas.simpleapplication.core.events.Publishable;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -13,13 +14,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class AddEntryCommand {
-
-
-	/**
-	 * The id of this command type
-	 */
-	public static final String COMMAND_ID = "jxclipboard.content.addentry";
+public class AddEntryCommand extends Publishable {
 
 
 	/**

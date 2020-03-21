@@ -2,6 +2,7 @@ package de.ruegnerlukas.jxclipboard.base.content;
 
 import de.ruegnerlukas.simpleapplication.common.events.EventSource;
 import de.ruegnerlukas.simpleapplication.common.events.specializedevents.EmptyEvent;
+import de.ruegnerlukas.simpleapplication.core.events.PublishableEvent.PublishableEventSource;
 import de.ruegnerlukas.simpleapplication.core.presentation.module.ExposedCommand;
 import de.ruegnerlukas.simpleapplication.core.presentation.module.ExposedEvent;
 import de.ruegnerlukas.simpleapplication.core.presentation.module.ModuleView;
@@ -30,27 +31,39 @@ public class ContentModuleView implements ModuleView {
 	/**
 	 * The command to add entries to the content list.
 	 */
-	private final EventSource<AddEntryCommand> addEntryCommand = new EventSource<>();
+	private final PublishableEventSource addEntryCommand = new PublishableEventSource(AddEntryCommand.class);
 
 
 	/**
 	 * The command to add entries to the content list.
 	 */
-	private final EventSource<RemoveEntryCommand> removeEntryCommand = new EventSource<>();
+	private final PublishableEventSource removeEntryCommand = new PublishableEventSource(RemoveEntryCommand.class);
 
 
 	/**
 	 * The event when an entry was removed from the list
 	 */
-	private final EventSource<EntryRemovedEvent> entryRemovedEvent = new EventSource<>();
+	private final PublishableEventSource entryRemovedEvent = new PublishableEventSource(EntryRemovedEvent.class);
 
 
 
 
 	@Override
 	public void initialize(final Pane pane) {
-		addEntryCommand.subscribe(event -> Platform.runLater(() -> addEntry(event.getEntryId(), event.getNode(), event.isRemovable())));
-		removeEntryCommand.subscribe(event -> Platform.runLater(() -> removeEntry(event.getEntryId(), false)));
+		addEntryCommand.subscribe(command -> Platform.runLater(() -> onAddEntry((AddEntryCommand) command)));
+		removeEntryCommand.subscribe(event -> Platform.runLater(() -> onRemoveEntry((RemoveEntryCommand) event)));
+	}
+
+
+
+
+	/**
+	 * Called when a {@link AddEntryCommand} is received.
+	 *
+	 * @param command the {@link AddEntryCommand}
+	 */
+	private void onAddEntry(final AddEntryCommand command) {
+		addEntry(command.getEntryId(), command.getNode(), command.isRemovable());
 	}
 
 
@@ -78,6 +91,18 @@ public class ContentModuleView implements ModuleView {
 
 
 	/**
+	 * Called when a {@link RemoveEntryCommand} is received.
+	 *
+	 * @param command the {@link RemoveEntryCommand}
+	 */
+	private void onRemoveEntry(final RemoveEntryCommand command) {
+		removeEntry(command.getEntryId(), false);
+	}
+
+
+
+
+	/**
 	 * Removes the entry with the given id.
 	 *
 	 * @param id     the id of the entry
@@ -99,7 +124,7 @@ public class ContentModuleView implements ModuleView {
 
 	@Override
 	public List<ExposedEvent> getExposedEvents() {
-		return List.of(ExposedEvent.global(EntryRemovedEvent.EVENT_ID, entryRemovedEvent));
+		return List.of(ExposedEvent.global(entryRemovedEvent.getChannel(), entryRemovedEvent));
 	}
 
 
@@ -108,8 +133,8 @@ public class ContentModuleView implements ModuleView {
 	@Override
 	public List<ExposedCommand> getExposedCommands() {
 		return List.of(
-				ExposedCommand.global(AddEntryCommand.COMMAND_ID, addEntryCommand),
-				ExposedCommand.global(RemoveEntryCommand.COMMAND_ID, removeEntryCommand)
+				ExposedCommand.global(addEntryCommand.getChannel(), addEntryCommand),
+				ExposedCommand.global(removeEntryCommand.getChannel(), removeEntryCommand)
 		);
 	}
 

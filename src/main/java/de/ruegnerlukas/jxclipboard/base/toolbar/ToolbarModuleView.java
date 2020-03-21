@@ -1,6 +1,6 @@
 package de.ruegnerlukas.jxclipboard.base.toolbar;
 
-import de.ruegnerlukas.simpleapplication.common.events.EventSource;
+import de.ruegnerlukas.simpleapplication.core.events.PublishableEvent.PublishableEventSource;
 import de.ruegnerlukas.simpleapplication.core.presentation.module.ExposedCommand;
 import de.ruegnerlukas.simpleapplication.core.presentation.module.ExposedEvent;
 import de.ruegnerlukas.simpleapplication.core.presentation.module.ModuleView;
@@ -27,17 +27,17 @@ public class ToolbarModuleView implements ModuleView {
 	/**
 	 * The event source for {@link ToolActionEvent}s.
 	 */
-	private EventSource<ToolActionEvent> toolActionEvent;
+	private PublishableEventSource toolActionEvent;
 
 	/**
 	 * The event source for {@link AddToolCommand}s.
 	 */
-	private EventSource<AddToolCommand> addToolCommand;
+	private PublishableEventSource addToolCommand;
 
 	/**
 	 * The event source for {@link AddToolCommand}s.
 	 */
-	private EventSource<RemoveToolCommand> removeToolCommand;
+	private PublishableEventSource removeToolCommand;
 
 
 
@@ -48,13 +48,13 @@ public class ToolbarModuleView implements ModuleView {
 		Anchors.setAnchors(toolbar, 0);
 		pane.getChildren().add(toolbar);
 
-		toolActionEvent = new EventSource<>();
+		toolActionEvent = new PublishableEventSource(ToolActionEvent.class);
 
-		addToolCommand = new EventSource<>();
-		addToolCommand.subscribe(cmd -> Platform.runLater(() -> onAddToolCommand(cmd)));
+		addToolCommand = new PublishableEventSource(AddToolCommand.class);
+		addToolCommand.subscribe(cmd -> Platform.runLater(() -> onAddToolCommand((AddToolCommand) cmd)));
 
-		removeToolCommand = new EventSource<>();
-		removeToolCommand.subscribe(cmd -> Platform.runLater(() -> onRemoveToolCommand(cmd)));
+		removeToolCommand = new PublishableEventSource(RemoveToolCommand.class);
+		removeToolCommand.subscribe(cmd -> Platform.runLater(() -> onRemoveToolCommand((RemoveToolCommand) cmd)));
 	}
 
 
@@ -134,7 +134,7 @@ public class ToolbarModuleView implements ModuleView {
 
 	@Override
 	public List<ExposedEvent> getExposedEvents() {
-		return List.of(ExposedEvent.global(ToolActionEvent.EVENT_ID, toolActionEvent));
+		return List.of(ExposedEvent.global(toolActionEvent.getChannel(), toolActionEvent));
 	}
 
 
@@ -143,8 +143,8 @@ public class ToolbarModuleView implements ModuleView {
 	@Override
 	public List<ExposedCommand> getExposedCommands() {
 		return List.of(
-				ExposedCommand.global(AddToolCommand.COMMAND_ID, addToolCommand),
-				ExposedCommand.global(RemoveToolCommand.COMMAND_ID, removeToolCommand)
+				ExposedCommand.global(addToolCommand.getChannel(), addToolCommand),
+				ExposedCommand.global(removeToolCommand.getChannel(), removeToolCommand)
 		);
 	}
 

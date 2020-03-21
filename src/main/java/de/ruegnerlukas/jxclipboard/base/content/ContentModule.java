@@ -11,7 +11,6 @@ public class ContentModule extends Module {
 	 * The default constructor
 	 */
 	public ContentModule() {
-//		super(new ContentModuleView(), new ModuleController.EmptyController());
 		super(new ContentModuleView(), new ModuleController.EmptyController(), Resource.internal("layout_content.fxml"));
 	}
 

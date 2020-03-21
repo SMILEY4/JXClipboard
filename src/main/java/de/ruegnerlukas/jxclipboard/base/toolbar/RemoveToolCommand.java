@@ -1,5 +1,6 @@
 package de.ruegnerlukas.jxclipboard.base.toolbar;
 
+import de.ruegnerlukas.simpleapplication.core.events.Publishable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,13 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class RemoveToolCommand {
-
-
-	/**
-	 * The id of this command type
-	 */
-	public static final String COMMAND_ID = "jxclipboard.toolbar.removetool";
+public class RemoveToolCommand extends Publishable {
 
 
 	/**

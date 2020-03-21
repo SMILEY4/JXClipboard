@@ -5,10 +5,13 @@ import de.ruegnerlukas.simpleapplication.common.instanceproviders.providers.Prov
 import de.ruegnerlukas.simpleapplication.common.instanceproviders.providers.StringProvider;
 import de.ruegnerlukas.simpleapplication.core.application.ApplicationConstants;
 import de.ruegnerlukas.simpleapplication.core.plugins.Plugin;
+import de.ruegnerlukas.simpleapplication.core.plugins.PluginInformation;
 import de.ruegnerlukas.simpleapplication.core.presentation.views.View;
 import de.ruegnerlukas.simpleapplication.core.presentation.views.ViewService;
 import javafx.geometry.Dimension2D;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Set;
 
 @Slf4j
 public class BasePlugin extends Plugin {
@@ -61,8 +64,13 @@ public class BasePlugin extends Plugin {
 	 * The default constructor
 	 */
 	public BasePlugin() {
-		super(PLUGIN_ID, DISPLAY_NAME, PLUGIN_VERSION, true);
-		this.getDependencyIds().add(ApplicationConstants.COMPONENT_VIEW_SYSTEM);
+		super(PluginInformation.builder()
+				.id(PLUGIN_ID)
+				.version(PLUGIN_VERSION)
+				.displayName(DISPLAY_NAME)
+				.autoload(true)
+				.dependencyIds(Set.of(ApplicationConstants.COMPONENT_VIEW_SYSTEM))
+				.build());
 	}
 
 

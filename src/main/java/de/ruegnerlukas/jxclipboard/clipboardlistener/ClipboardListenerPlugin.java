@@ -3,18 +3,20 @@ package de.ruegnerlukas.jxclipboard.clipboardlistener;
 import de.ruegnerlukas.jxclipboard.base.toolbar.AddToolCommand;
 import de.ruegnerlukas.jxclipboard.base.toolbar.RemoveToolCommand;
 import de.ruegnerlukas.jxclipboard.base.toolbar.ToolActionEvent;
+import de.ruegnerlukas.jxclipboard.clipboard.ClipboardChangedEvent;
 import de.ruegnerlukas.jxclipboard.clipboard.ClipboardPlugin;
 import de.ruegnerlukas.jxclipboard.clipboard.ClipboardWriter;
-import de.ruegnerlukas.simpleapplication.common.events.EventPackage;
-import de.ruegnerlukas.simpleapplication.common.events.specializedevents.EventBusListener;
+import de.ruegnerlukas.simpleapplication.common.events.Channel;
 import de.ruegnerlukas.simpleapplication.common.instanceproviders.providers.Provider;
 import de.ruegnerlukas.simpleapplication.core.events.EventService;
 import de.ruegnerlukas.simpleapplication.core.extensions.ExtensionPointService;
 import de.ruegnerlukas.simpleapplication.core.plugins.Plugin;
+import de.ruegnerlukas.simpleapplication.core.plugins.PluginInformation;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.util.Set;
 
 /**
  * - Listens for changes of the clipboard content and triggers a clipboard event.
@@ -41,12 +43,6 @@ public class ClipboardListenerPlugin extends Plugin {
 	 * The name of the tool to save the current clipboard.
 	 */
 	private static final String TOOLNAME_ENABLE_LISTENER = "Auto. Enabled";
-
-
-	/**
-	 * The name of the event triggered when the content of the clipboard changed.
-	 */
-	public static final String EVENT_CLIPBOARD_CHANGED = "jxclipboard.clipboardlistener.clipboardChanged";
 
 	/**
 	 * The provider for the event service
@@ -75,8 +71,13 @@ public class ClipboardListenerPlugin extends Plugin {
 	 * Default constructor.
 	 */
 	public ClipboardListenerPlugin() {
-		super(PLUGIN_ID, DISPLAY_NAME, PLUGIN_VERSION, true);
-		this.getDependencyIds().add(ClipboardPlugin.PLUGIN_ID);
+		super(PluginInformation.builder()
+				.id(PLUGIN_ID)
+				.version(PLUGIN_VERSION)
+				.displayName(DISPLAY_NAME)
+				.autoload(true)
+				.dependencyIds(Set.of(ClipboardPlugin.PLUGIN_ID))
+				.build());
 	}
 
 
@@ -96,9 +97,9 @@ public class ClipboardListenerPlugin extends Plugin {
 	 */
 	private void addEnableTool() {
 		final EventService eventService = eventServiceProvider.get();
-		eventService.publish(AddToolCommand.COMMAND_ID, new EventPackage<>(new AddToolCommand(TOOLNAME_ENABLE_LISTENER, true)));
-		eventService.subscribe(ToolActionEvent.EVENT_ID, (EventBusListener<ToolActionEvent>) eventPackage -> {
-			final ToolActionEvent event = eventPackage.getEvent();
+		eventService.publish(new AddToolCommand(TOOLNAME_ENABLE_LISTENER, true));
+		eventService.subscribe(Channel.type(ToolActionEvent.class), publishable -> {
+			final ToolActionEvent event = (ToolActionEvent) publishable;
 			if (event.getToolName().equals(TOOLNAME_ENABLE_LISTENER)) {
 				this.triggerEvents = event.isSelected();
 				extensionPointService.get().find(ClipboardPlugin.EXTENSION_POINT_CLIPBOARD_WRITER).ifPresent(extensionPoint -> {
@@ -125,7 +126,7 @@ public class ClipboardListenerPlugin extends Plugin {
 	private void startListener() {
 		this.listener = new ClipBoardListener(clipboardContent -> {
 			if (triggerEvents) {
-				eventServiceProvider.get().publish(EVENT_CLIPBOARD_CHANGED, new EventPackage<>(clipboardContent));
+				eventServiceProvider.get().publish(new ClipboardChangedEvent(clipboardContent));
 			}
 		});
 		this.listener.start();
@@ -136,8 +137,7 @@ public class ClipboardListenerPlugin extends Plugin {
 
 	@Override
 	public void onUnload() {
-		eventServiceProvider.get().publish(RemoveToolCommand.COMMAND_ID,
-				new EventPackage<>(new RemoveToolCommand(TOOLNAME_ENABLE_LISTENER)));
+		eventServiceProvider.get().publish(new RemoveToolCommand(TOOLNAME_ENABLE_LISTENER));
 	}
 
 }

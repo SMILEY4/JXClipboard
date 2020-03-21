@@ -5,14 +5,13 @@ import de.ruegnerlukas.jxclipboard.base.content.AddEntryCommand;
 import de.ruegnerlukas.jxclipboard.base.toolbar.AddToolCommand;
 import de.ruegnerlukas.jxclipboard.base.toolbar.RemoveToolCommand;
 import de.ruegnerlukas.jxclipboard.base.toolbar.ToolActionEvent;
-import de.ruegnerlukas.jxclipboard.clipboardlistener.ClipboardListenerPlugin;
-import de.ruegnerlukas.simpleapplication.common.events.EventPackage;
-import de.ruegnerlukas.simpleapplication.common.events.specializedevents.EventBusListener;
+import de.ruegnerlukas.simpleapplication.common.events.Channel;
 import de.ruegnerlukas.simpleapplication.common.instanceproviders.providers.Provider;
 import de.ruegnerlukas.simpleapplication.core.events.EventService;
 import de.ruegnerlukas.simpleapplication.core.extensions.ExtensionPoint;
 import de.ruegnerlukas.simpleapplication.core.extensions.ExtensionPointService;
 import de.ruegnerlukas.simpleapplication.core.plugins.Plugin;
+import de.ruegnerlukas.simpleapplication.core.plugins.PluginInformation;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.Toolkit;
@@ -22,6 +21,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -85,8 +85,13 @@ public class ClipboardPlugin extends Plugin {
 	 * Default constructor.
 	 */
 	public ClipboardPlugin() {
-		super(PLUGIN_ID, DISPLAY_NAME, PLUGIN_VERSION, true);
-		this.getDependencyIds().add(BasePlugin.PLUGIN_ID);
+		super(PluginInformation.builder()
+				.id(PLUGIN_ID)
+				.version(PLUGIN_VERSION)
+				.displayName(DISPLAY_NAME)
+				.autoload(true)
+				.dependencyIds(Set.of(BasePlugin.PLUGIN_ID))
+				.build());
 	}
 
 
@@ -107,9 +112,9 @@ public class ClipboardPlugin extends Plugin {
 	 */
 	private void addSaveClipboardTool() {
 		final EventService eventService = eventServiceProvider.get();
-		eventService.publish(AddToolCommand.COMMAND_ID, new EventPackage<>(new AddToolCommand(TOOLNAME_SAVE_CLIPBOARD, false)));
-		eventService.subscribe(ToolActionEvent.EVENT_ID, (EventBusListener<ToolActionEvent>) eventPackage -> {
-			final ToolActionEvent event = eventPackage.getEvent();
+		eventService.publish(new AddToolCommand(TOOLNAME_SAVE_CLIPBOARD, false));
+		eventService.subscribe(Channel.type(ToolActionEvent.class), publishable -> {
+			final ToolActionEvent event = (ToolActionEvent) publishable;
 			if (event.getToolName().equals(TOOLNAME_SAVE_CLIPBOARD)) {
 				saveCurrentClipboard();
 			}
@@ -123,8 +128,9 @@ public class ClipboardPlugin extends Plugin {
 	 * Adds the listener for clipboard events.
 	 */
 	private void setupClipboardListener() {
-		eventServiceProvider.get().subscribe(ClipboardListenerPlugin.EVENT_CLIPBOARD_CHANGED, eventPackage -> {
-			saveClipboard((String) eventPackage.getEvent());
+		eventServiceProvider.get().subscribe(Channel.type(ClipboardChangedEvent.class), publishable -> {
+			final ClipboardChangedEvent event = (ClipboardChangedEvent) publishable;
+			saveClipboard(event.getContent());
 		});
 	}
 
@@ -203,6 +209,9 @@ public class ClipboardPlugin extends Plugin {
 		Optional.ofNullable(reader.read()).ifPresent(this::saveClipboard);
 	}
 
+
+
+
 	/**
 	 * Saves the given content of the clipboard and adds a new entry to the content list.
 	 *
@@ -211,7 +220,7 @@ public class ClipboardPlugin extends Plugin {
 	private void saveClipboard(final String content) {
 		final String entryId = UUID.randomUUID().toString();
 		final AddEntryCommand command = AddEntryCommand.clipboardEntry(entryId, content, () -> writer.write(content));
-		eventServiceProvider.get().publish(AddEntryCommand.COMMAND_ID, new EventPackage<>(command));
+		eventServiceProvider.get().publish(command);
 	}
 
 
@@ -219,8 +228,7 @@ public class ClipboardPlugin extends Plugin {
 
 	@Override
 	public void onUnload() {
-		eventServiceProvider.get().publish(RemoveToolCommand.COMMAND_ID,
-				new EventPackage<>(new RemoveToolCommand(TOOLNAME_SAVE_CLIPBOARD)));
+		eventServiceProvider.get().publish(new RemoveToolCommand(TOOLNAME_SAVE_CLIPBOARD));
 	}
 
 }

@@ -1,5 +1,6 @@
 package de.ruegnerlukas.jxclipboard.base.toolbar;
 
+import de.ruegnerlukas.simpleapplication.core.events.Publishable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,13 +8,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ToolActionEvent {
+public class ToolActionEvent extends Publishable {
 
-
-	/**
-	 * The id of this event type.
-	 */
-	public static final String EVENT_ID = "jxclipboard.toolbar.action";
 
 	/**
 	 * The name of the tool.

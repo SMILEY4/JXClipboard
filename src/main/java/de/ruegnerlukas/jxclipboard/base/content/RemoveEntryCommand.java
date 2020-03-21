@@ -1,17 +1,12 @@
 package de.ruegnerlukas.jxclipboard.base.content;
 
+import de.ruegnerlukas.simpleapplication.core.events.Publishable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class RemoveEntryCommand {
-
-
-	/**
-	 * The id of this command type
-	 */
-	public static final String COMMAND_ID = "jxclipboard.content.removeentry";
+public class RemoveEntryCommand extends Publishable {
 
 
 	/**

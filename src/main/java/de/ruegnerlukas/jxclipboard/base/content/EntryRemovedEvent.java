@@ -1,17 +1,12 @@
 package de.ruegnerlukas.jxclipboard.base.content;
 
+import de.ruegnerlukas.simpleapplication.core.events.Publishable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class EntryRemovedEvent {
-
-
-	/**
-	 * The id of this event type
-	 */
-	public static final String EVENT_ID = "jxclipboard.content.entryremoved";
+public class EntryRemovedEvent extends Publishable {
 
 
 	/**
