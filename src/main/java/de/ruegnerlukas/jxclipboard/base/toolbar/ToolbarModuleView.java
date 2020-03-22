@@ -134,7 +134,7 @@ public class ToolbarModuleView implements ModuleView {
 
 	@Override
 	public List<ExposedEvent> getExposedEvents() {
-		return List.of(ExposedEvent.global(toolActionEvent.getChannel(), toolActionEvent));
+		return List.of(ExposedEvent.global(toolActionEvent));
 	}
 
 
@@ -143,8 +143,8 @@ public class ToolbarModuleView implements ModuleView {
 	@Override
 	public List<ExposedCommand> getExposedCommands() {
 		return List.of(
-				ExposedCommand.global(addToolCommand.getChannel(), addToolCommand),
-				ExposedCommand.global(removeToolCommand.getChannel(), removeToolCommand)
+				ExposedCommand.global(addToolCommand),
+				ExposedCommand.global(removeToolCommand)
 		);
 	}
 

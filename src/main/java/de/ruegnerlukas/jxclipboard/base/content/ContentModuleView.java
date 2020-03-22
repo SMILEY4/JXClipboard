@@ -124,7 +124,7 @@ public class ContentModuleView implements ModuleView {
 
 	@Override
 	public List<ExposedEvent> getExposedEvents() {
-		return List.of(ExposedEvent.global(entryRemovedEvent.getChannel(), entryRemovedEvent));
+		return List.of(ExposedEvent.global(entryRemovedEvent));
 	}
 
 
@@ -133,8 +133,8 @@ public class ContentModuleView implements ModuleView {
 	@Override
 	public List<ExposedCommand> getExposedCommands() {
 		return List.of(
-				ExposedCommand.global(addEntryCommand.getChannel(), addEntryCommand),
-				ExposedCommand.global(removeEntryCommand.getChannel(), removeEntryCommand)
+				ExposedCommand.global(addEntryCommand),
+				ExposedCommand.global(removeEntryCommand)
 		);
 	}
 
