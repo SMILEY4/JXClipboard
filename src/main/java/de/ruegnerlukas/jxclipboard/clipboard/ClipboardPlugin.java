@@ -154,7 +154,7 @@ public class ClipboardPlugin extends Plugin {
 	private void saveCurrentClipboard() {
 		Optional.ofNullable(reader.read()).ifPresent(
 				content -> jxClipboardStateProvider.get().update(JXClipboardState.class,
-						state -> state.getSavedEntries().add(0, content)));
+						state -> state.addEntry(content)));
 	}
 
 

@@ -1,12 +1,17 @@
 package de.ruegnerlukas.jxclipboard.base;
 
 import de.ruegnerlukas.jxclipboard.JXClipboardState;
+import de.ruegnerlukas.simpleapplication.common.instanceproviders.providers.Provider;
 import de.ruegnerlukas.simpleapplication.common.utils.Pair;
 import de.ruegnerlukas.simpleapplication.core.simpleui.assets.elements.SuiComponent;
 import de.ruegnerlukas.simpleapplication.core.simpleui.core.node.NodeFactory;
 import javafx.geometry.Pos;
 import javafx.scene.control.ScrollPane;
+import org.kordamp.ikonli.javafx.FontIcon;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.util.stream.IntStream;
 
 import static de.ruegnerlukas.simpleapplication.core.simpleui.assets.SuiElements.button;
@@ -42,12 +47,12 @@ public class ContentArea extends SuiComponent<JXClipboardState> {
 		);
 	}
 
-
+// content, index, int -> rem "index" -> content, int
 
 
 	private static NodeFactory buildEntry(final int index, final String content) {
 		return hBox()
-				.id("entry-" + index)
+				.id("entry-" + content)
 				.styleClass("entry")
 				.spacing(5)
 				.sizeMax(10000, 40)
@@ -61,12 +66,24 @@ public class ContentArea extends SuiComponent<JXClipboardState> {
 								.id("btn-copy")
 								.sizeMin(40, 40)
 								.sizeMax(40, 40)
-								.textContent("C"),
+								.styleClass("btn-copy")
+								.graphic(new FontIcon(), 0)
+								.eventAction(".", e -> {
+									StringSelection selection = new StringSelection(content);
+									Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+									clipboard.setContents(selection, selection);
+								}),
 						button()
 								.id("btn-remove")
 								.sizeMin(40, 40)
 								.sizeMax(40, 40)
-								.textContent("X")
+								.styleClass("btn-remove")
+								.graphic(new FontIcon(), 0)
+								.eventAction(".", e -> {
+									System.out.println("remove: " + content);
+									final JXClipboardState state = new Provider<>(JXClipboardState.class).get();
+									state.update(JXClipboardState.class, s -> s.removeEntry(content));
+								})
 				);
 	}
 

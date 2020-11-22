@@ -91,15 +91,15 @@ public class ClipboardListenerPlugin extends Plugin {
 
 
 
+
 	/**
 	 * Start the clipboard listener.
 	 */
 	private void startListener() {
 		this.listener = new ClipBoardListener(clipboardContent -> {
-			System.out.println("content: " + clipboardContent);
 			if (triggerEvents) {
 				jxClipboardStateProvider.get().update(JXClipboardState.class,
-						state -> state.getSavedEntries().add(0, clipboardContent));
+						state -> state.addEntry(clipboardContent));
 			}
 		});
 		this.listener.start();
