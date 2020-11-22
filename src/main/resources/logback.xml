@@ -4,7 +4,7 @@
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>
-                %green(%d{yyyy-MM-dd HH:mm:ss.SSS}) %colorize(%-5level) %cyan([%-40.40logger{10}]) - %msg%n
+                %green(%d{yyyy-MM-dd HH:mm:ss.SSS}) %colorize(%-5level) %cyan([%thread]) %cyan([%-40.40logger{10}]) - %colorize(%msg%n)
             </pattern>
         </encoder>
     </appender>

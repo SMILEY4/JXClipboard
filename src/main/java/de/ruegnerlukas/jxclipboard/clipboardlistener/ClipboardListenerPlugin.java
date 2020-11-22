@@ -1,22 +1,16 @@
 package de.ruegnerlukas.jxclipboard.clipboardlistener;
 
-import de.ruegnerlukas.jxclipboard.base.toolbar.AddToolCommand;
-import de.ruegnerlukas.jxclipboard.base.toolbar.RemoveToolCommand;
-import de.ruegnerlukas.jxclipboard.base.toolbar.ToolActionEvent;
-import de.ruegnerlukas.jxclipboard.clipboard.ClipboardChangedEvent;
+import de.ruegnerlukas.jxclipboard.JXClipboardState;
+import de.ruegnerlukas.jxclipboard.base.Toolbar;
 import de.ruegnerlukas.jxclipboard.clipboard.ClipboardPlugin;
-import de.ruegnerlukas.jxclipboard.clipboard.ClipboardWriter;
-import de.ruegnerlukas.simpleapplication.common.events.Channel;
 import de.ruegnerlukas.simpleapplication.common.instanceproviders.providers.Provider;
-import de.ruegnerlukas.simpleapplication.core.events.EventService;
-import de.ruegnerlukas.simpleapplication.core.extensions.ExtensionPointService;
 import de.ruegnerlukas.simpleapplication.core.plugins.Plugin;
 import de.ruegnerlukas.simpleapplication.core.plugins.PluginInformation;
+import de.ruegnerlukas.simpleapplication.core.simpleui.core.registry.SuiRegistry;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.util.Set;
+
+import static de.ruegnerlukas.simpleapplication.core.simpleui.assets.SuiElements.toggleButton;
 
 /**
  * - Listens for changes of the clipboard content and triggers a clipboard event.
@@ -45,14 +39,14 @@ public class ClipboardListenerPlugin extends Plugin {
 	private static final String TOOLNAME_ENABLE_LISTENER = "Auto. Enabled";
 
 	/**
-	 * The provider for the event service
+	 * The provider for the sui registry
 	 */
-	private final Provider<EventService> eventServiceProvider = new Provider<>(EventService.class);
+	private final Provider<SuiRegistry> suiRegistryProvider = new Provider<>(SuiRegistry.class);
 
 	/**
-	 * The provider for the extension point service
+	 * The provider for the state
 	 */
-	private final Provider<ExtensionPointService> extensionPointService = new Provider<>(ExtensionPointService.class);
+	private final Provider<JXClipboardState> jxClipboardStateProvider = new Provider<>(JXClipboardState.class);
 
 	/**
 	 * The clipboard listener
@@ -85,38 +79,15 @@ public class ClipboardListenerPlugin extends Plugin {
 
 	@Override
 	public void onLoad() {
-		addEnableTool();
+		final SuiRegistry suiRegistry = suiRegistryProvider.get();
+		suiRegistry.inject(Toolbar.TOOL_INJECTION_POINT,
+				toggleButton()
+						.id("tool.auto-save")
+						.textContent("Auto")
+						.eventChecked(".", event -> triggerEvents = event.isChecked())
+		);
 		startListener();
 	}
-
-
-
-
-	/**
-	 * Adds the tool to enable/disable the listener.
-	 */
-	private void addEnableTool() {
-		final EventService eventService = eventServiceProvider.get();
-		eventService.publish(new AddToolCommand(TOOLNAME_ENABLE_LISTENER, true));
-		eventService.subscribe(Channel.type(ToolActionEvent.class), publishable -> {
-			final ToolActionEvent event = (ToolActionEvent) publishable;
-			if (event.getToolName().equals(TOOLNAME_ENABLE_LISTENER)) {
-				this.triggerEvents = event.isSelected();
-				extensionPointService.get().find(ClipboardPlugin.EXTENSION_POINT_CLIPBOARD_WRITER).ifPresent(extensionPoint -> {
-					if (event.isSelected()) {
-						extensionPoint.provide(ClipboardWriter.class, (ClipboardWriter) content -> {
-							StringSelection selection = new StringSelection(content);
-							Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-							clipboard.setContents(selection, listener);
-						});
-					} else {
-						extensionPoint.provide(ClipboardWriter.class, null);
-					}
-				});
-			}
-		});
-	}
-
 
 
 
@@ -125,8 +96,10 @@ public class ClipboardListenerPlugin extends Plugin {
 	 */
 	private void startListener() {
 		this.listener = new ClipBoardListener(clipboardContent -> {
+			System.out.println("content: " + clipboardContent);
 			if (triggerEvents) {
-				eventServiceProvider.get().publish(new ClipboardChangedEvent(clipboardContent));
+				jxClipboardStateProvider.get().update(JXClipboardState.class,
+						state -> state.getSavedEntries().add(0, clipboardContent));
 			}
 		});
 		this.listener.start();
@@ -137,7 +110,6 @@ public class ClipboardListenerPlugin extends Plugin {
 
 	@Override
 	public void onUnload() {
-		eventServiceProvider.get().publish(new RemoveToolCommand(TOOLNAME_ENABLE_LISTENER));
 	}
 
 }

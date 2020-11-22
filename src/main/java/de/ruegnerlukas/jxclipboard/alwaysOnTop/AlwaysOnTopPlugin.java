@@ -1,18 +1,20 @@
 package de.ruegnerlukas.jxclipboard.alwaysOnTop;
 
 import de.ruegnerlukas.jxclipboard.base.BasePlugin;
-import de.ruegnerlukas.jxclipboard.base.toolbar.AddToolCommand;
-import de.ruegnerlukas.jxclipboard.base.toolbar.ToolActionEvent;
-import de.ruegnerlukas.simpleapplication.common.events.Channel;
+import de.ruegnerlukas.jxclipboard.base.Toolbar;
 import de.ruegnerlukas.simpleapplication.common.instanceproviders.providers.Provider;
 import de.ruegnerlukas.simpleapplication.core.application.ApplicationConstants;
-import de.ruegnerlukas.simpleapplication.core.events.EventService;
 import de.ruegnerlukas.simpleapplication.core.plugins.Plugin;
 import de.ruegnerlukas.simpleapplication.core.plugins.PluginInformation;
+import de.ruegnerlukas.simpleapplication.core.simpleui.core.registry.SuiRegistry;
 import javafx.stage.Stage;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Set;
 
+import static de.ruegnerlukas.simpleapplication.core.simpleui.assets.SuiElements.toggleButton;
+
+@Slf4j
 public class AlwaysOnTopPlugin extends Plugin {
 
 
@@ -32,15 +34,9 @@ public class AlwaysOnTopPlugin extends Plugin {
 	private static final String PLUGIN_VERSION = "1.0";
 
 	/**
-	 * The name of the tool.
+	 * The provider for the sui registry
 	 */
-	private static final String TOOLNAME_ALWAYS_ON_TOP = "Always On Top";
-
-	/**
-	 * The provider for the event service
-	 */
-	private final Provider<EventService> eventServiceProvider = new Provider<>(EventService.class);
-
+	private final Provider<SuiRegistry> suiRegistryProvider = new Provider<>(SuiRegistry.class);
 
 	/**
 	 * The provider for the primary stage
@@ -68,25 +64,20 @@ public class AlwaysOnTopPlugin extends Plugin {
 
 	@Override
 	public void onLoad() {
-		final EventService eventService = eventServiceProvider.get();
-		eventService.publish(new AddToolCommand(TOOLNAME_ALWAYS_ON_TOP, true));
-		eventService.subscribe(Channel.type(ToolActionEvent.class), publishable -> {
-			final ToolActionEvent event = (ToolActionEvent) publishable;
-			if (event.getToolName().equals(TOOLNAME_ALWAYS_ON_TOP)) {
-				onToolEvent(event.isSelected());
-			}
-		});
+		final SuiRegistry suiRegistry = suiRegistryProvider.get();
+		suiRegistry.inject(Toolbar.TOOL_INJECTION_POINT,
+				toggleButton()
+						.id("tool.always-on-top")
+						.textContent("Always on top")
+						.eventChecked(".", event -> onAlwaysOnTop(event.isChecked()))
+		);
 	}
 
 
 
 
-	/**
-	 * Called when the user interacted with the tool button.
-	 *
-	 * @param enabled whether the tool is enabled or disabled
-	 */
-	private void onToolEvent(final boolean enabled) {
+	private void onAlwaysOnTop(final boolean enabled) {
+		log.debug("Set stage always on top: {}.", enabled);
 		primaryStageProvider.get().setAlwaysOnTop(enabled);
 	}
 

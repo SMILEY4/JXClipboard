@@ -4,6 +4,7 @@ import de.ruegnerlukas.jxclipboard.alwaysOnTop.AlwaysOnTopPlugin;
 import de.ruegnerlukas.jxclipboard.base.BasePlugin;
 import de.ruegnerlukas.jxclipboard.clipboard.ClipboardPlugin;
 import de.ruegnerlukas.jxclipboard.clipboardlistener.ClipboardListenerPlugin;
+import de.ruegnerlukas.simpleapplication.common.instanceproviders.factories.InstanceFactory;
 import de.ruegnerlukas.simpleapplication.common.instanceproviders.factories.IntegerFactory;
 import de.ruegnerlukas.simpleapplication.common.instanceproviders.factories.StringFactory;
 import de.ruegnerlukas.simpleapplication.core.application.Application;
@@ -32,12 +33,17 @@ public class JXClipboard {
 	 */
 	public static void main(final String[] args) {
 		final ApplicationConfiguration configuration = new ApplicationConfiguration();
-		configuration.setShowViewAtStartup(false);
 
 		configuration.getProviderFactories().add(new StringFactory("jfclipboard.name", "JFClipboard"));
 		configuration.getProviderFactories().add(new StringFactory("jfclipboard.version", "0.1"));
 		configuration.getProviderFactories().add(new IntegerFactory("jfclipboard.framewidth", FRAME_WIDTH));
 		configuration.getProviderFactories().add(new IntegerFactory("jfclipboard.frameheight", FRAME_HEIGHT));
+		configuration.getProviderFactories().add(new InstanceFactory<>(JXClipboardState.class) {
+			@Override
+			public JXClipboardState buildObject() {
+				return new JXClipboardState();
+			}
+		});
 
 		configuration.getPlugins().add(new BasePlugin());
 		configuration.getPlugins().add(new ClipboardPlugin());
