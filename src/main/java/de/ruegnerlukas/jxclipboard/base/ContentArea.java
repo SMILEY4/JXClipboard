@@ -2,7 +2,6 @@ package de.ruegnerlukas.jxclipboard.base;
 
 import de.ruegnerlukas.jxclipboard.JXClipboardState;
 import de.ruegnerlukas.simpleapplication.common.instanceproviders.providers.Provider;
-import de.ruegnerlukas.simpleapplication.common.utils.Pair;
 import de.ruegnerlukas.simpleapplication.core.simpleui.assets.elements.SuiComponent;
 import de.ruegnerlukas.simpleapplication.core.simpleui.core.node.NodeFactory;
 import javafx.geometry.Pos;
@@ -12,7 +11,6 @@ import org.kordamp.ikonli.javafx.FontIcon;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-import java.util.stream.IntStream;
 
 import static de.ruegnerlukas.simpleapplication.core.simpleui.assets.SuiElements.button;
 import static de.ruegnerlukas.simpleapplication.core.simpleui.assets.SuiElements.hBox;
@@ -38,23 +36,21 @@ public class ContentArea extends SuiComponent<JXClipboardState> {
 										.padding(5, 0, 0, 0)
 										.styleClass("content-area")
 										.spacing(5)
-										.items(IntStream.range(0, state.getSavedEntries().size())
-												.mapToObj(index -> Pair.of(index, state.getSavedEntries().get(index)))
-												.map(pair -> buildEntry(pair.getLeft(), pair.getRight()))
-										)
+										.items(state.getSavedEntries().stream().map(ContentArea::buildEntry))
 						)
 
 		);
 	}
 
-// content, index, int -> rem "index" -> content, int
 
 
-	private static NodeFactory buildEntry(final int index, final String content) {
+
+	private static NodeFactory buildEntry(final String content) {
 		return hBox()
 				.id("entry-" + content)
 				.styleClass("entry")
 				.spacing(5)
+				.margin(0, 0, 5, 5)
 				.sizeMax(10000, 40)
 				.alignment(Pos.CENTER_LEFT)
 				.items(
@@ -80,7 +76,6 @@ public class ContentArea extends SuiComponent<JXClipboardState> {
 								.styleClass("btn-remove")
 								.graphic(new FontIcon(), 0)
 								.eventAction(".", e -> {
-									System.out.println("remove: " + content);
 									final JXClipboardState state = new Provider<>(JXClipboardState.class).get();
 									state.update(JXClipboardState.class, s -> s.removeEntry(content));
 								})
