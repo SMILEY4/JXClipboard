@@ -1,11 +1,11 @@
-name: build linux
+name: build mac
 
 on: [ push ]
 
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v1
@@ -29,6 +29,6 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          name: artifact-linux
+          name: artifact-mac
           path: target/
           retention-days: 2
