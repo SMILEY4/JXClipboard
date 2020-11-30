@@ -15,7 +15,13 @@ jobs:
         with:
           java-version: 11.0.5
 
-      - name: Build with Maven
+      - name: install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run:
+          mvn clean install -DskipTests
+
+      - name: jlink
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run:
