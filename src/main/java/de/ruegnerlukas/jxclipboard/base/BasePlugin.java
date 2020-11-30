@@ -101,7 +101,8 @@ public class BasePlugin extends Plugin {
 		final SuiSceneController controller = new SuiSceneController(
 				jxClipboardState,
 				windowRoot(stage)
-						.windowBaseStyle(SuiWindowBaseStyle.cssStylesheet(Resource.externalRelative("src/main/resources/style/base.css")))
+						.windowBaseStyle(SuiWindowBaseStyle.cssStylesheet(Resource.internal("style/base.css")))
+//						.windowBaseStyle(SuiWindowBaseStyle.cssStylesheet(Resource.externalRelative("src/main/resources/style/base.css")))
 						.title(appNameProvider.get() + " (" + appVersionProvider.get() + ")")
 						.size(appFrameWidth.get(), appFrameHeight.get())
 						.content(JXClipboardState.class, this::createUI)
@@ -116,7 +117,8 @@ public class BasePlugin extends Plugin {
 		return anchorPane()
 				.id("root")
 				.styleClass("app-root")
-				.style(Resource.externalRelative("src/main/resources/style/jfxclipboard.css"))
+				.style(Resource.internal("style/jfxclipboard.css"))
+//				.style(Resource.externalRelative("src/main/resources/style/jfxclipboard.css"))
 				.items(
 						new Toolbar(),
 						new ContentArea()
