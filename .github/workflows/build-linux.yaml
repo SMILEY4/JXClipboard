@@ -26,6 +26,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run:
           mvn javafx:jlink
+
+      - uses: actions/upload-artifact@v2
         with:
-          name: created zip
-          path: target/JXClipboard.zip
+            name: target directory
+            path: target/
+            retention-days: 5
