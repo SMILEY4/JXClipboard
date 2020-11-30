@@ -26,3 +26,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run:
           mvn javafx:jlink
+        with:
+          name: created zip
+          path: target/JXClipboard.zip
