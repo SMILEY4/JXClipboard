@@ -1,15 +1,14 @@
 open module JXClipboard {
-	requires transitive javafx.controls;
-	requires transitive javafx.fxml;
-//	requires transitive org.slf4j;
-	requires transitive com.fasterxml.jackson.core;
-	requires transitive com.fasterxml.jackson.databind;
-	requires transitive com.fasterxml.jackson.annotation;
-	requires transitive SimpleApplication;
-	requires transitive org.kordamp.iconli.core;
-	requires transitive org.kordamp.ikonli.fontawesome;
-	requires transitive org.kordamp.ikonli.javafx;
-	requires static lombok;
+	requires javafx.controls;
+	requires javafx.fxml;
+	requires com.fasterxml.jackson.core;
+	requires com.fasterxml.jackson.databind;
+	requires com.fasterxml.jackson.annotation;
+	requires SimpleApplication;
+	requires org.kordamp.iconli.core;
+	requires org.kordamp.ikonli.fontawesome;
+	requires org.kordamp.ikonli.javafx;
 	requires java.datatransfer;
 	requires java.desktop;
+	requires static lombok;
 }
